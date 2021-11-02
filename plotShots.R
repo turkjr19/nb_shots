@@ -236,21 +236,16 @@ nhl_rink_plot <- function () {
 rink <- nhl_rink_plot()
 rink
 
-box <- tibble(
-  x.plot = 100,
-  y.plot = 42.5
-)
+
 
 NB_olive <- "#7c7610"
 NB_gold <- "#f5d20e"
 
-library(png)
-img <- readPNG("nb_image.png")
 
 
 # plot shots
-rink + geom_point(data = viz_df, aes(x=x.plot, y=y.plot)) +
-ggtitle("North Bay Battalion shot attempts\n as of Oct 31/21") +
+rink + geom_point(data = wakely, aes(x=x.plot, y=y.plot)) +
+ggtitle("Dalyn Wakely shot attempts\n as of Oct 31/21") +
   ggeasy::easy_center_title() +
   labs(caption = "data retrieved from ontariohockeyleague.com") +
   annotate("text", x = c(-50, 50), y=50, label = c("away", "home"),

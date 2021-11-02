@@ -144,4 +144,7 @@ viz_df <- z %>%
 
 # append to google sheet
 sheet_append(ss, data = viz_df)
-  
+
+
+wakely <- df2 %>% 
+  filter(full_name == "Dalyn Wakely")
