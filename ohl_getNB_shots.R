@@ -39,6 +39,13 @@ df2_previous <- df2 %>%
 gameIDs <- gameIDs %>% 
   anti_join(df2_previous, by = "ohl_game_id")
 
+# logic to check if there were games yesterday
+# if there were no games stop and print
+# if there were games continue on with lineups and events
+if(nrow(gameIDs) == 0){
+  stop("all games have been scraped - nothing to scrape")
+}
+
 ## now scrape events
 # get the number of games to scrape
 pb_count <- nrow(gameIDs)
