@@ -8,12 +8,10 @@ library(googlesheets4)
 
 # pull all ohl games from github
 df <- read.csv("https://raw.githubusercontent.com/turkjr19/nb_shots/main/ohl_2021_2022_regSeasonGameIDs.csv")
-
 # pull ohl roster names from github
-rosters <- read.csv("https://raw.githubusercontent.com/turkjr19/nb_shots/main/rosters11-01-21.csv")
+rosters <- read.csv("https://raw.githubusercontent.com/turkjr19/nb_shots/main/rosters11-30-21.csv")
 
 # get google sheet and establish where to append too later in code
-# script may stop and ask to authenticate.  Type number 1 in console to authenticate to claircornish@gmail.com
 ss <- gs4_get('https://docs.google.com/spreadsheets/d/1aueTPPjV3axvQU9Eu7T-LLbzW2CASZKy5iI7vuNrJK8/edit?usp=sharing')
 
 # read sheet from googlesheet (nb_shots shared in claircornish google drive)
@@ -68,6 +66,7 @@ for (i in 1:nrow(gameIDs)) {
   Sys.sleep(tmsleep)
   shots <- NULL
 
+
 str1 <- "https://cluster.leaguestat.com/feed/index.php?feed=gc&key=2976319eb44abe94&client_code=ohl&game_id="
 str2 <- "&lang_code=en&fmt=json&tab=pxpverbose"
 game_url <- paste0(str1,game_ID,str2)
@@ -82,14 +81,16 @@ events <- as_tibble(json_data[["GC"]][["Pxpverbose"]]) %>%
   mutate(ohl_game_id = ohl_game_id) %>%
   select(ohl_game_id, everything())
 
+
 # get shot data
 shots <- events %>% 
   filter(event == "shot") %>% 
-  select(ohl_game_id, event, time, s, team_id, x_location, y_location,
+  select(ohl_game_id, event, time, s, period_id, team_id, x_location, y_location,
          shot_player_id = "player_id", home, shot_type, shot_type_description,
          shot_quality_description)
 
 output <- bind_rows(shots, output)
+
 
 setTxtProgressBar(pb, i)
 
@@ -97,9 +98,14 @@ setTxtProgressBar(pb, i)
 
 
 # ***** cleaning shot data and pulling out what we need *****
+# define specific game if necessary
+#x <- 24786
+
+
 y <- output %>% 
+  #filter(ohl_game_id == x) %>% 
   filter(team_id == 19) %>% # filter only North Bay shots
-  select(ohl_game_id, team_id, x_location, y_location,
+  select(ohl_game_id, team_id, period_id, x_location, y_location,
          shot_player_id, shot_quality_description) %>% 
   mutate(shot_id = row_number()) # need this to use for joining later
 
@@ -114,10 +120,12 @@ z <- y %>%
 opponent <- gameIDs %>% 
   select(ohl_game_id, date_played, opponent)
 
+
 # create columns so that shots will appear properly on the plot
 viz_df <- z %>% 
   left_join(y, by = "shot_id") %>% 
   select(ohl_game_id, shot_id, x_location, y_location, full_name,
+         period = "period_id",
          shot_quality_description) %>% 
   mutate(x.plot = x_location,
          y.plot = y_location*-1) %>%
@@ -128,7 +136,8 @@ viz_df <- z %>%
   mutate(x.plot = x.plot/2.93) %>% 
   mutate(y.plot = case_when(
     y.plot >0 ~ y.plot/3,
-    y.plot <0 ~ y.plot/3
+    y.plot <0 ~ y.plot/3,
+    TRUE ~ (as.numeric(.$y.plot)),
   )) %>% 
   mutate(result = case_when(
     shot_quality_description == "Quality goal" ~ "goal",
@@ -137,9 +146,13 @@ viz_df <- z %>%
   )) %>% 
   left_join(opponent, by = "ohl_game_id") %>% 
   select(ohl_game_id, date_played, opponent,
-         shot_id:result) %>% 
-  filter(y.plot < 42,
-         y.plot > -42) %>% 
+         shot_id:result) %>%
+  mutate(y.plot = case_when(
+    y.plot > 42 ~ 41.9,
+    y.plot < -42 ~ -41.9,
+    TRUE ~ (as.numeric(.$y.plot))
+  )) %>%
+  mutate(TEAM = "NB") %>% 
   arrange(date_played)
 
 # append to google sheet
