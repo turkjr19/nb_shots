@@ -1,9 +1,11 @@
-# file to determine if shots are in homeplate zones
+# determine if shots are within homeplate zones
+# create report of shooting percentage for homeplate and outside homeplate
+# create goal report
+
 # load libraries
 library(tidyverse)
 library(googlesheets4)
-library(sp) # install.packages("sp") if computer doesn't have this
-# package installed
+library(sp) # install.packages("sp") if computer doesn't have this package installed
 
 # create away home plate polygon
 x_coord <- c( -89, -69, -54, -54, -69, -89, -89)
@@ -22,7 +24,7 @@ df2 <- read_sheet("https://docs.google.com/spreadsheets/d/1aueTPPjV3axvQU9Eu7T-L
 shot <- df2 %>% 
   select(full_name, x.plot, y.plot, result)
 
-# determine if shots were in home plate area
+# determine if shots were in home plate area and add to shot dataframe
 shot <- shot %>% 
   mutate(away_hplate = point.in.polygon(shot$x.plot, shot$y.plot,
                                         x_coord,y_coord)) %>% 
@@ -72,7 +74,7 @@ non_homeplate_goal_report <- shot %>%
   tally() %>% 
   rename(non_homeplate_goals = "n")
 
-# combine
+# combine to produce report
 goal_report <- homeplate_goal_report %>% 
   left_join(non_homeplate_goal_report, by = "full_name") %>% 
   mutate(across(everything(), ~replace_na(.x, 0))) %>% 
