@@ -66,7 +66,6 @@ for (i in 1:nrow(gameIDs)) {
   Sys.sleep(tmsleep)
   shots <- NULL
 
-
 str1 <- "https://cluster.leaguestat.com/feed/index.php?feed=gc&key=2976319eb44abe94&client_code=ohl&game_id="
 str2 <- "&lang_code=en&fmt=json&tab=pxpverbose"
 game_url <- paste0(str1,game_ID,str2)
@@ -81,7 +80,6 @@ events <- as_tibble(json_data[["GC"]][["Pxpverbose"]]) %>%
   mutate(ohl_game_id = ohl_game_id) %>%
   select(ohl_game_id, everything())
 
-
 # get shot data
 shots <- events %>% 
   filter(event == "shot") %>% 
@@ -91,17 +89,11 @@ shots <- events %>%
 
 output <- bind_rows(shots, output)
 
-
 setTxtProgressBar(pb, i)
 
 }
 
-
 # ***** cleaning shot data and pulling out what we need *****
-# define specific game if necessary
-#x <- 24786
-
-
 y <- output %>% 
   #filter(ohl_game_id == x) %>% 
   filter(team_id == 19) %>% # filter only North Bay shots
@@ -119,7 +111,6 @@ z <- y %>%
 # pull out opponent to join with shot data
 opponent <- gameIDs %>% 
   select(ohl_game_id, date_played, opponent)
-
 
 # create columns so that shots will appear properly on the plot
 viz_df <- z %>% 
