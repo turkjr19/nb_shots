@@ -15,9 +15,6 @@ x_coord2 <- c(89, 69, 54, 54, 69, 89, 89)
 y_coord2 <- c(3, 22, 22, -22, -22, -3, 3)
 home_homeplate <- cbind(x_coord, y_coord)
 
-# get google sheet and establish where to append too later in code
-ss <- gs4_get('https://docs.google.com/spreadsheets/d/1aueTPPjV3axvQU9Eu7T-LLbzW2CASZKy5iI7vuNrJK8/edit?usp=sharing')
-
 # read sheet from googlesheet (nb_shots shared in claircornish google drive)
 df2 <- read_sheet("https://docs.google.com/spreadsheets/d/1aueTPPjV3axvQU9Eu7T-LLbzW2CASZKy5iI7vuNrJK8/edit?usp=sharing")
 
