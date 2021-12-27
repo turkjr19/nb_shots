@@ -9,7 +9,7 @@ library(googlesheets4)
 # pull all ohl games from github
 df <- read.csv("https://raw.githubusercontent.com/turkjr19/nb_shots/main/ohl_2021_2022_regSeasonGameIDs.csv")
 # pull ohl roster names from github
-rosters <- read.csv("https://raw.githubusercontent.com/turkjr19/nb_shots/main/rosters11-30-21.csv")
+rosters <- read.csv("https://raw.githubusercontent.com/turkjr19/ohl_scrape/main/data/rosters_Dec24.csv")
 
 # get google sheet and establish where to append too later in code
 ss <- gs4_get('https://docs.google.com/spreadsheets/d/1aueTPPjV3axvQU9Eu7T-LLbzW2CASZKy5iI7vuNrJK8/edit?usp=sharing')
